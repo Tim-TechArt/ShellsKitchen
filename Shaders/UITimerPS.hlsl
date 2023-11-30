@@ -27,6 +27,7 @@ PixelOutput main(UISpriteVertexToPixel input)
 
     
     //--------------------------------------------------------------------------------
+    //-- Global stuff
     //-- Calculating for global bounce scaling         
     float sub10sec = step(seconds, 10);
     float pulseDriver = smoothstep(0.5, 1, frac(seconds)) * sub10sec;
@@ -35,7 +36,10 @@ PixelOutput main(UISpriteVertexToPixel input)
     float scale = Remap(0, 1, 1, 0.8, pulse);
     float2 uvScaled = RotateScaleUV(uv, 0.45, 0, float2(scale, scale));
     float digitScale = Remap(1, 0.8, 1, 0.85, scale);
-    
+
+    float4 maskSize = float4(0.3, 0.7, 0.461, 0.537);
+    float blur = float(0.01);
+
     uvScaled *= float2(3, 0.5);
 
     float2 adjPos = float2(0.204, 0.2549);
@@ -50,12 +54,12 @@ PixelOutput main(UISpriteVertexToPixel input)
     float zeroPoint = 0.447;
     float2 posSecOne = float2((adjPos.r - 1) * 1.5, adjPos.g);
     float2 uvSamp = uvScaled + float2(posSecOne);
-    float digitMask = Rect(uvSamp, 0.3, 0.7, 0.46, 0.54, 0.01);
+    float digitMask = Rect(uvSamp, maskSize.x, maskSize.y, maskSize.z, maskSize.w, blur);
     
     uvSamp = RotateScaleUV(uvSamp, 0.55, 0, float2(digitScale, digitScale)); //<-- Individual bounce scaling
     uvSamp += float2(0, secOnesAnim - zeroPoint);
     
-    float4 secondsOne = albedoTexture.Sample(wrapSampler, uvSamp) * digitMask;
+    float4 secondsOne = albedoTexture.Sample(wrapSampler, uvSamp) * float4(1, 1, 1, digitMask); //Only mask out alpha channel
 
     
     //--------------------------------------------------------------------------------
@@ -67,12 +71,12 @@ PixelOutput main(UISpriteVertexToPixel input)
     //-- Calculating position and what number to sample for the second seconds digit --    
     float2 posSecTen = float2((adjPos.r - 0.8) * 1.5, adjPos.g);
     uvSamp = uvScaled + float2(posSecTen);
-    digitMask = Rect(uvSamp, 0.3, 0.7, 0.46, 0.54, 0.01);
+    digitMask = Rect(uvSamp, maskSize.x, maskSize.y, maskSize.z, maskSize.w, blur);
     
     uvSamp = RotateScaleUV(uvSamp, 0.56, 0, float2(digitScale, digitScale)); //<-- Individual bounce scaling
     uvSamp += float2(0, secTenAnim - zeroPoint);
     
-    float4 secondsTen = albedoTexture.Sample(wrapSampler, uvSamp) * digitMask;
+    float4 secondsTen = albedoTexture.Sample(wrapSampler, uvSamp) * float4(1, 1, 1, digitMask); //Only mask out alpha channel;
 
     
     //--------------------------------------------------------------------------------
@@ -84,12 +88,12 @@ PixelOutput main(UISpriteVertexToPixel input)
     //-- Calculating position and what number to sample for the first minute digit --    
     float2 posMinute = float2((adjPos.r - 0.5) * 1.5, adjPos.g);
     uvSamp = uvScaled + float2(posMinute);
-    digitMask = Rect(uvSamp, 0.3, 0.7, 0.46, 0.54, 0.01);
+    digitMask = Rect(uvSamp, maskSize.x, maskSize.y, maskSize.z, maskSize.w, blur);
         
     uvSamp = RotateScaleUV(uvSamp, 0.55, 0, float2(digitScale, digitScale)); //<-- Individual bounce scaling
     uvSamp += float2(0, minOnesAnim - zeroPoint);
     
-    float4 minutesOne = albedoTexture.Sample(wrapSampler, uvSamp) * digitMask;
+    float4 minutesOne = albedoTexture.Sample(wrapSampler, uvSamp) * float4(1, 1, 1, digitMask); //Only mask out alpha channel;
     
     
     //--------------------------------------------------------------------------------
